@@ -79,6 +79,7 @@ functions =
       , arithmeticOperator "min" min
       , arithmeticOperator "max" max
       , arithmeticFun "abs" abs
+      , showFun "showInt" (T.pack . show . base10Exponent)
       ])
   , ("Function combinators", [idf, compose, flipf])
   ]
@@ -893,6 +894,21 @@ arithmeticFun name f =
            case (x) of
              (ConstantCore (NumberConstant a)) ->
                ConstantCore (NumberConstant (f a))
+             _ -> error ("type error for arguments to " <> show name))
+  , definitionType = JSONType .-> JSONType
+  , definitionDoc = name <> " b"
+  }
+
+showFun :: Text -> (Scientific -> Text) -> Definition
+showFun name f =
+  Definition
+  { definitionName = Variable name
+  , definitionCore =
+      EvalCore
+        (\x ->
+           case (x) of
+             (ConstantCore (NumberConstant a)) ->
+               ConstantCore (StringConstant (f a))
              _ -> error ("type error for arguments to " <> show name))
   , definitionType = JSONType .-> JSONType
   , definitionDoc = name <> " b"
