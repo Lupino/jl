@@ -37,7 +37,7 @@ scope = M.fromList (map (definitionName &&&definitionCore) (concatMap snd functi
 -- | All functions.
 functions :: [(Text, [Definition])]
 functions =
-  [ ("Record access", [getf, setf, modifyf, keysf, elemsf])
+  [ ("Record access", [getf, setf, modifyf, keysf, elemsf, filterWithKeyf])
   , ( "Sequences"
     , [ mapf
       , filterf
@@ -142,6 +142,32 @@ modifyf =
         (FunctionType
            (FunctionType JSONType JSONType)
            (FunctionType JSONType JSONType))
+  }
+
+filterWithKeyf :: Definition
+filterWithKeyf =
+  Definition
+  { definitionDoc = "Filter the object with function f"
+  , definitionName = Variable "filterWithKey"
+  , definitionCore =
+      (EvalCore
+         (\f ->
+            EvalCore
+              (\obj ->
+                case obj of
+                  (RecordCore o) ->
+                    RecordCore (HM.filterWithKey (\k v ->
+                      case eval (ApplicationCore
+                        (ApplicationCore f
+                          (ConstantCore
+                            (StringConstant k))) v) of
+                          ConstantCore (BoolConstant b) -> b
+                          _                             -> True
+                        ) o))))
+  , definitionType =
+      FunctionType
+        (FunctionType JSONType (FunctionType JSONType JSONType))
+        (FunctionType JSONType JSONType)
   }
 
 getf :: Definition
