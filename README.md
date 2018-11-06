@@ -216,6 +216,12 @@ elems :: JSON → JSON
 
 Get all elements of the object
 
+```haskell
+filterWithKey :: (JSON → JSON → JSON) → JSON → JSON
+```
+
+Filter the object with function f
+
 
 ## Sequences
 
@@ -477,6 +483,11 @@ abs :: JSON → JSON
 
 abs b
 
+```haskell
+showInt :: JSON → JSON
+```
+
+showInt b
 
 ## Function combinators
 
